@@ -1,0 +1,43 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Ride.Models;
+
+namespace Ride.Services
+{
+    public class FareRepository : IFareRepository
+    {
+        private readonly RideContext _context;
+
+        public FareRepository(RideContext context)
+        {
+            _context = context;
+        }
+       
+
+        public async Task<Fare> GetFareByIdAsync(int fareId)
+        {
+            return await _context.Fares.FindAsync(fareId);
+        }
+
+        public async Task AddFareAsync(Fare fare)
+        {
+            await _context.Fares.AddAsync(fare);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateFareAsync(Fare fare)
+        {
+            _context.Fares.Update(fare);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteFareAsync(int fareId)
+        {
+            var fare = await _context.Fares.FindAsync(fareId);
+            if (fare != null)
+            {
+                _context.Fares.Remove(fare);
+                await _context.SaveChangesAsync();
+            }
+        }   
+    }
+}

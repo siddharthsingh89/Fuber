@@ -1,0 +1,11 @@
+@Ride_HostAddress = http://localhost:5283
+
+POST {{Ride_HostAddress}}/api/ride/fare
+Accept: application/json
+content-Type: application/json
+
+{
+    "pickupLocation" : "Financial District",
+    "destination" : "Microsoft"
+}
+###
