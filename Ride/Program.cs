@@ -13,6 +13,8 @@ namespace Ride
             builder.Services.AddDbContext<RideContext>();
             // Add services to the container.
             builder.Services.AddScoped<IFareRepository, FareRepository>();
+            builder.Services.AddScoped<IMappingService, AzureMappingService>();
+            builder.Services.AddScoped<IPricingService, PricingService>();
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();

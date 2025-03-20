@@ -12,10 +12,17 @@ namespace Ride.Controllers
        
         private readonly ILogger<RideController> _logger;
         private readonly IFareRepository _fareRepository;
-        public RideController(ILogger<RideController> logger, IFareRepository fareRepository)
+        private readonly IMappingService _mappingService;
+        private readonly IPricingService _pricingService;
+        public RideController(ILogger<RideController> logger,
+                            IFareRepository fareRepository,
+                            IMappingService mappingService,
+                            IPricingService pricingService)
         {
             _logger = logger;
             _fareRepository = fareRepository;
+            _mappingService = mappingService;
+            _pricingService = pricingService;
         }
 
         [HttpPost("Fare")]
@@ -36,9 +43,27 @@ namespace Ride.Controllers
                 FareName = "Standard",
                 UserId = 1
             };
-
+            //fix the models
+            string result = await _mappingService.GetETAForSourceAndDestination(fare.Source, fare.Destination);
+            string finalPrice = await _pricingService.GetEstimatedFare();
             await _fareRepository.AddFareAsync(fare);
             var fareFromDb = await _fareRepository.GetFareByIdAsync(fare.FareId);
+            return Ok(fareFromDb);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> RequestRide([Bind] RideRequest rideRequest)
+        {
+            if (rideRequest == null || string.IsNullOrWhiteSpace(rideRequest.FareId.ToString()))
+            {
+                return BadRequest();
+            }
+
+            
+            var fareFromDb = await _fareRepository.GetFareByIdAsync(rideRequest.FareId);
+            //Call RideMatching service to get available drivers
+            // This should be async polling pattern
             return Ok(fareFromDb);
         }
     }
